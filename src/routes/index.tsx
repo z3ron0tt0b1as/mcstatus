@@ -675,7 +675,7 @@ function StatusPage() {
                   key={c.id}
                   icon={REPORT_ICONS[c.id]}
                   label={c.label}
-                  disabled={cooling}
+                  cooling={cooling}
                   onClick={() => submitReport(c.id, c.label)}
                 />
               ))}
@@ -1272,19 +1272,27 @@ function ReportBtn({
   icon,
   label,
   onClick,
-  disabled,
+  cooling,
 }: {
   icon: React.ReactNode;
   label: string;
   onClick: () => void;
-  disabled?: boolean;
+  /**
+   * During the cooldown the button stays clickable on purpose: tapping it
+   * surfaces the "you can report again in …" notice instead of silently doing
+   * nothing. We only dim it and swap the cursor to signal the wait.
+   */
+  cooling?: boolean;
 }) {
   return (
     <motion.button
       whileTap={{ scale: 0.96 }}
       onClick={onClick}
-      disabled={disabled}
-      className="flex flex-col items-center justify-center gap-1.5 rounded-xl border border-report-border bg-report-bg px-3 py-3 text-xs font-semibold text-ink transition hover:-translate-y-0.5 hover:bg-report-hover hover:shadow-sm active:translate-y-0 disabled:pointer-events-none disabled:opacity-50 sm:py-4 sm:text-sm"
+      aria-disabled={cooling}
+      className={cn(
+        "flex flex-col items-center justify-center gap-1.5 rounded-xl border border-report-border bg-report-bg px-3 py-3 text-xs font-semibold text-ink transition hover:-translate-y-0.5 hover:bg-report-hover hover:shadow-sm active:translate-y-0 sm:py-4 sm:text-sm",
+        cooling && "cursor-not-allowed opacity-50 hover:translate-y-0",
+      )}
     >
       <span className="text-danger-ink">{icon}</span>
       <span>{label}</span>

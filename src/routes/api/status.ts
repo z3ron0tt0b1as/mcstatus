@@ -92,11 +92,18 @@ async function probe(svc: Service): Promise<ProbeResult> {
 // reported down (recovery is reported immediately). While suppressing a blip we
 // keep showing the last good latency/HTTP code so the card stays coherent.
 const FAIL_STREAK = 2;
+// Latency is smoothed with an exponential moving average so a single slow probe
+// (network jitter, or a probe that only succeeded after a retry — its latency
+// includes the backoff) can't momentarily shove a service over the "degraded"
+// threshold and then snap it straight back to "operational". The EMA reacts to
+// a *sustained* slowdown over a few snapshots but absorbs one-off spikes.
+const LATENCY_EMA_ALPHA = 0.3; // weight of the newest sample (0..1)
 type Smoothed = {
   confirmed: "online" | "offline";
   fails: number;
   lastHttp: number;
-  lastLatency: number;
+  /** EMA of recent online-probe latency, in ms. */
+  emaLatency: number;
 };
 const smoothing = new Map<string, Smoothed>();
 
@@ -105,14 +112,18 @@ function smoothStatus(r: ProbeResult): ProbeResult {
     confirmed: "online", // optimistic: assume up until proven otherwise
     fails: 0,
     lastHttp: r.httpStatus,
-    lastLatency: r.latency,
+    emaLatency: r.latency,
   };
 
   if (r.status === "online") {
     prev.confirmed = "online";
     prev.fails = 0;
     prev.lastHttp = r.httpStatus;
-    prev.lastLatency = r.latency;
+    // Fold the fresh sample into the moving average instead of trusting it
+    // outright, so transient spikes don't flicker the status badge.
+    prev.emaLatency = Math.round(
+      LATENCY_EMA_ALPHA * r.latency + (1 - LATENCY_EMA_ALPHA) * prev.emaLatency,
+    );
   } else {
     prev.fails += 1;
     if (prev.fails >= FAIL_STREAK) prev.confirmed = "offline";
@@ -124,7 +135,7 @@ function smoothStatus(r: ProbeResult): ProbeResult {
         ...r,
         status: "online",
         httpStatus: prev.lastHttp,
-        latency: prev.lastLatency,
+        latency: prev.emaLatency,
       }
     : { ...r, status: "offline" };
 }
