@@ -96,6 +96,85 @@ export function synthUptimeSeries(s: SvcLike, tf: TimeFrame) {
   return { points, uptime, outages };
 }
 
+export type DayLevel =
+  "operational" | "degraded" | "partial" | "major" | "nodata";
+
+export type DayUptime = {
+  /** ISO yyyy-mm-dd */
+  date: string;
+  /** Human label, e.g. "Jan 5, 2026". */
+  label: string;
+  level: DayLevel;
+  /** Uptime percentage for that day. */
+  uptime: number;
+  /** Number of incidents that touched this day. */
+  incidents: number;
+};
+
+/**
+ * Deterministic per-service daily uptime history for the classic
+ * statuspage-style 90-day bar strip. Seeded from the service id so bars are
+ * stable across renders. The most recent day reflects the live status.
+ */
+export function synthDailyUptime(
+  s: SvcLike,
+  days = 90,
+): { days: DayUptime[]; uptime: number; incidents: number } {
+  const r = rand(hash(s.id + "daily90"));
+  const out: DayUptime[] = [];
+  let sum = 0;
+  let incidentTotal = 0;
+  for (let i = days - 1; i >= 0; i--) {
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    d.setDate(d.getDate() - i);
+    const isToday = i === 0;
+    let level: DayLevel;
+    let uptime: number;
+    let incidents = 0;
+    if (isToday && s.status === "offline") {
+      level = "major";
+      uptime = Math.round((40 + r() * 40) * 10) / 10;
+      incidents = 1;
+    } else {
+      const roll = r();
+      if (roll < 0.018) {
+        level = "major";
+        uptime = Math.round((70 + r() * 20) * 10) / 10;
+        incidents = 1;
+      } else if (roll < 0.06) {
+        level = "partial";
+        uptime = Math.round((92 + r() * 6) * 10) / 10;
+        incidents = 1;
+      } else if (roll < 0.14) {
+        level = "degraded";
+        uptime = Math.round((98.5 + r() * 1.2) * 10) / 10;
+      } else {
+        level = "operational";
+        uptime = Math.round((99.85 + r() * 0.15) * 100) / 100;
+      }
+    }
+    sum += uptime;
+    incidentTotal += incidents;
+    out.push({
+      date: d.toISOString().slice(0, 10),
+      label: d.toLocaleDateString(undefined, {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      }),
+      level,
+      uptime,
+      incidents,
+    });
+  }
+  return {
+    days: out,
+    uptime: Math.round((sum / days) * 1000) / 1000,
+    incidents: incidentTotal,
+  };
+}
+
 export function synthLatencySeries(s: SvcLike, tf: TimeFrame) {
   const { n, labelEvery, mkLabel } = tfPoints(tf);
   const r = rand(hash(s.id + "lat" + tf));

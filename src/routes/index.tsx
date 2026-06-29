@@ -60,6 +60,10 @@ import { StatusRing } from "@/components/StatusRing";
 import { StatusBadge, StatusDot } from "@/components/StatusBadge";
 import { RefreshControl } from "@/components/RefreshControl";
 import { Reveal } from "@/components/Reveal";
+import { UptimeBars } from "@/components/UptimeBars";
+import { StatusLegend } from "@/components/StatusLegend";
+import { SystemMetrics } from "@/components/SystemMetrics";
+import { PastIncidents } from "@/components/PastIncidents";
 import { useTheme, chartPalette } from "@/lib/theme";
 import {
   aggregateLevel,
@@ -556,6 +560,23 @@ function StatusPage() {
                   <Layers className="h-4 w-4" /> View all services
                 </a>
               </div>
+
+              <dl className="mt-7 grid max-w-lg grid-cols-3 gap-3">
+                <HeroStat
+                  label="Services up"
+                  value={total ? `${online}/${total}` : "—"}
+                  tone="success"
+                />
+                <HeroStat
+                  label="Active incidents"
+                  value={String(openIncidents.length)}
+                  tone={openIncidents.length > 0 ? "warn" : "default"}
+                />
+                <HeroStat
+                  label="Avg response"
+                  value={total ? `${avgLatency}ms` : "—"}
+                />
+              </dl>
             </div>
 
             <HeroHealth
@@ -604,6 +625,11 @@ function StatusPage() {
             }
             delay={0.15}
           />
+        </section>
+
+        {/* Aggregate uptime & incident metrics */}
+        <section className="mt-3">
+          <SystemMetrics services={services} incidents={incidents} />
         </section>
 
         {/* Secondary system stats */}
@@ -716,6 +742,8 @@ function StatusPage() {
             <SearchBar value={search} onChange={setSearch} />
           </div>
 
+          <StatusLegend className="mt-4" />
+
           {status.isLoading && services.length === 0 ? (
             <div className="mt-6 space-y-3">
               {Array.from({ length: 6 }).map((_, i) => (
@@ -766,6 +794,9 @@ function StatusPage() {
           loading={servers.isLoading}
           theme={theme}
         />
+
+        {/* Past incidents grouped by calendar date */}
+        <PastIncidents incidents={incidents} />
 
         {/* Incident Timeline (history at the bottom) */}
         <IncidentTimeline
@@ -997,6 +1028,31 @@ function HeroHealth({
         </div>
       </div>
     </motion.div>
+  );
+}
+
+function HeroStat({
+  label,
+  value,
+  tone = "default",
+}: {
+  label: string;
+  value: string;
+  tone?: "default" | "success" | "warn";
+}) {
+  const valueColor =
+    tone === "success"
+      ? "text-success-ink"
+      : tone === "warn"
+        ? "text-warn-ink"
+        : "text-ink";
+  return (
+    <div className="rounded-xl border border-line bg-card/60 px-3 py-2.5">
+      <dd className={cn("text-xl font-extrabold tabular-nums", valueColor)}>
+        {value}
+      </dd>
+      <dt className="mt-0.5 text-[11px] font-medium text-muted">{label}</dt>
+    </div>
   );
 }
 
@@ -1765,6 +1821,13 @@ function ServiceCard({
             />
           </AreaChart>
         </ResponsiveContainer>
+      </div>
+
+      <div
+        className="mt-4 border-t border-line pt-3"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <UptimeBars service={service} />
       </div>
 
       {openInc && (
