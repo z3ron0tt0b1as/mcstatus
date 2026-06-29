@@ -1,0 +1,385 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Design tokens. Every semantic colour is a raw CSS variable defined in :root
+ * (light) and .dark (dark), then mapped to a Tailwind utility via @theme inline.
+ * The product is a premium, gaming-inspired Minecraft status dashboard — dark by
+ * default, emerald/grass-green accent, deep slate surfaces, glassmorphism and a
+ * subtle animated aurora background. All colours use oklch.
+ */
+
+@theme inline {
+  --color-canvas: var(--canvas);
+  --color-card: var(--card-bg);
+  --color-elevated: var(--elevated);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted-fg);
+  --color-muted-surface: var(--muted-surface);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-link: var(--link);
+
+  --color-brand: var(--brand);
+  --color-brand-foreground: var(--brand-fg);
+  --color-brand-soft: var(--brand-soft);
+
+  --color-success: var(--success);
+  --color-success-bg: var(--success-bg);
+  --color-success-ink: var(--success-ink);
+
+  --color-warn: var(--warn);
+  --color-warn-bg: var(--warn-bg);
+  --color-warn-ink: var(--warn-ink);
+
+  /* Partial-outage (orange) — the missing rung between degraded and major. */
+  --color-partial: var(--partial);
+  --color-partial-bg: var(--partial-bg);
+  --color-partial-ink: var(--partial-ink);
+
+  --color-danger: var(--danger);
+  --color-danger-bg: var(--danger-bg);
+  --color-danger-ink: var(--danger-ink);
+
+  --color-report-bg: var(--report-bg);
+  --color-report-hover: var(--report-hover);
+  --color-report-border: var(--report-border);
+
+  --color-cat-login: oklch(0.62 0.22 25);
+  --color-cat-realms: oklch(0.58 0.2 350);
+  --color-cat-launch: oklch(0.62 0.18 235);
+  --color-cat-multi: oklch(0.78 0.16 75);
+  --color-cat-other: oklch(0.7 0.07 260);
+
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+}
+
+/* ---------- Light theme ---------- */
+:root {
+  --canvas: oklch(0.98 0.006 160);
+  --card-bg: oklch(1 0 0 / 0.86);
+  --elevated: oklch(0.985 0.005 160);
+  --ink: oklch(0.21 0.02 200);
+  --muted-fg: oklch(0.48 0.02 200);
+  --muted-surface: oklch(0.955 0.008 170);
+  --line: oklch(0.9 0.01 180);
+  --line-strong: oklch(0.83 0.015 180);
+  --link: oklch(0.52 0.15 200);
+
+  /* Minecraft grass/emerald green. */
+  --brand: oklch(0.62 0.16 152);
+  --brand-fg: oklch(0.99 0.01 152);
+  --brand-soft: oklch(0.94 0.06 152);
+
+  --success: oklch(0.65 0.17 152);
+  --success-bg: oklch(0.95 0.06 152);
+  --success-ink: oklch(0.45 0.15 152);
+
+  --warn: oklch(0.78 0.15 85);
+  --warn-bg: oklch(0.96 0.08 90);
+  --warn-ink: oklch(0.5 0.12 75);
+
+  --partial: oklch(0.7 0.17 55);
+  --partial-bg: oklch(0.95 0.08 60);
+  --partial-ink: oklch(0.52 0.16 50);
+
+  --danger: oklch(0.62 0.22 25);
+  --danger-bg: oklch(0.95 0.06 25);
+  --danger-ink: oklch(0.52 0.22 27);
+
+  --report-bg: oklch(0.97 0.02 25);
+  --report-hover: oklch(0.95 0.04 25);
+  --report-border: oklch(0.9 0.04 25);
+
+  /* Glass + glow + animated background. */
+  --glass-bg: oklch(1 0 0 / 0.7);
+  --glass-border: oklch(0.5 0.02 200 / 0.14);
+  --glow: oklch(0.62 0.16 152 / 0.35);
+  --aurora-1: oklch(0.8 0.16 152 / 0.22);
+  --aurora-2: oklch(0.78 0.12 200 / 0.18);
+  --grid-line: oklch(0.5 0.02 200 / 0.05);
+  --shadow-card:
+    0 1px 2px oklch(0.4 0.02 200 / 0.06), 0 8px 24px oklch(0.4 0.02 200 / 0.06);
+}
+
+/* ---------- Dark theme (default look) ---------- */
+.dark {
+  --canvas: oklch(0.16 0.012 200);
+  --card-bg: oklch(0.225 0.016 205 / 0.72);
+  --elevated: oklch(0.26 0.018 205);
+  --ink: oklch(0.97 0.005 180);
+  --muted-fg: oklch(0.72 0.02 195);
+  --muted-surface: oklch(0.3 0.02 205);
+  --line: oklch(0.36 0.02 205 / 0.7);
+  --line-strong: oklch(0.46 0.025 205);
+  --link: oklch(0.78 0.13 175);
+
+  --brand: oklch(0.78 0.17 152);
+  --brand-fg: oklch(0.18 0.04 152);
+  --brand-soft: oklch(0.32 0.08 152);
+
+  --success: oklch(0.78 0.17 152);
+  --success-bg: oklch(0.32 0.08 152);
+  --success-ink: oklch(0.87 0.14 152);
+
+  --warn: oklch(0.82 0.15 88);
+  --warn-bg: oklch(0.34 0.07 80);
+  --warn-ink: oklch(0.88 0.13 88);
+
+  --partial: oklch(0.75 0.16 55);
+  --partial-bg: oklch(0.34 0.09 50);
+  --partial-ink: oklch(0.85 0.13 58);
+
+  --danger: oklch(0.68 0.21 25);
+  --danger-bg: oklch(0.33 0.1 25);
+  --danger-ink: oklch(0.84 0.14 27);
+
+  --report-bg: oklch(0.28 0.04 25);
+  --report-hover: oklch(0.33 0.06 25);
+  --report-border: oklch(0.4 0.07 25);
+
+  --glass-bg: oklch(0.24 0.018 205 / 0.55);
+  --glass-border: oklch(0.75 0.03 180 / 0.12);
+  --glow: oklch(0.78 0.17 152 / 0.3);
+  --aurora-1: oklch(0.7 0.2 152 / 0.16);
+  --aurora-2: oklch(0.6 0.16 200 / 0.14);
+  --grid-line: oklch(0.7 0.03 180 / 0.035);
+  --shadow-card: 0 1px 2px oklch(0 0 0 / 0.3), 0 12px 32px oklch(0 0 0 / 0.35);
+}
+
+/* ---- shadcn/ui tokens (kept for the component library) ------------------- */
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-background: var(--canvas);
+  --color-foreground: var(--ink);
+  --color-card-foreground: var(--ink);
+  --color-popover: var(--elevated);
+  --color-popover-foreground: var(--ink);
+  --color-primary: var(--brand);
+  --color-primary-foreground: var(--brand-fg);
+  --color-secondary: var(--muted-surface);
+  --color-secondary-foreground: var(--ink);
+  --color-muted-foreground: var(--muted-fg);
+  --color-accent: var(--muted-surface);
+  --color-accent-foreground: var(--ink);
+  --color-destructive: var(--danger);
+  --color-destructive-foreground: var(--brand-fg);
+  --color-border: var(--line);
+  --color-input: var(--line);
+  --color-ring: var(--brand);
+}
+
+:root {
+  --radius: 0.9rem;
+}
+
+@layer base {
+  * {
+    border-color: var(--line);
+  }
+
+  html {
+    color-scheme: dark;
+  }
+  html:not(.dark) {
+    color-scheme: light;
+  }
+
+  html,
+  body {
+    background-color: var(--canvas);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    -webkit-text-size-adjust: 100%;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background-color: color-mix(in oklch, var(--brand) 30%, transparent);
+  }
+
+  /* Smooth theme transitions on surfaces & text. */
+  body,
+  .theme-transition,
+  [class*="bg-card"],
+  [class*="bg-canvas"],
+  [class*="bg-elevated"] {
+    transition:
+      background-color 0.3s ease,
+      border-color 0.3s ease,
+      color 0.3s ease;
+  }
+
+  .recharts-text,
+  .recharts-cartesian-axis-tick-value {
+    fill: var(--muted-fg);
+  }
+}
+
+@layer utilities {
+  /* Thin, theme-aware scrollbars for inner scroll areas. */
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: var(--line-strong) transparent;
+  }
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: var(--line-strong);
+    border-radius: 9999px;
+  }
+
+  /* ---- Glassmorphism ---- */
+  .glass {
+    background: var(--glass-bg);
+    backdrop-filter: blur(16px) saturate(150%);
+    -webkit-backdrop-filter: blur(16px) saturate(150%);
+    border: 1px solid var(--glass-border);
+  }
+  .glass-strong {
+    background: color-mix(in oklch, var(--glass-bg) 70%, var(--canvas));
+    backdrop-filter: blur(20px) saturate(160%);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    border: 1px solid var(--glass-border);
+  }
+
+  /* Soft brand glow used on hover for featured cards/buttons. */
+  .glow-brand {
+    box-shadow:
+      0 0 0 1px var(--glass-border),
+      0 18px 50px -12px var(--glow);
+  }
+
+  .ring-track {
+    stroke: color-mix(in oklch, var(--muted-fg) 22%, transparent);
+  }
+
+  .text-gradient-brand {
+    background: linear-gradient(
+      100deg,
+      var(--ink) 0%,
+      color-mix(in oklch, var(--brand) 75%, var(--ink)) 55%,
+      var(--brand) 100%
+    );
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+  }
+
+  /* ---- Animated aurora + grid background ---- */
+  .app-bg {
+    position: fixed;
+    inset: 0;
+    z-index: -10;
+    overflow: hidden;
+    pointer-events: none;
+    background:
+      radial-gradient(
+        120% 80% at 50% -10%,
+        color-mix(in oklch, var(--brand) 8%, transparent),
+        transparent 60%
+      ),
+      var(--canvas);
+  }
+  .app-bg::before,
+  .app-bg::after {
+    content: "";
+    position: absolute;
+    width: 60vw;
+    height: 60vw;
+    border-radius: 50%;
+    filter: blur(90px);
+    will-change: transform;
+  }
+  .app-bg::before {
+    top: -20vw;
+    left: -10vw;
+    background: var(--aurora-1);
+    animation: aurora-a 26s ease-in-out infinite;
+  }
+  .app-bg::after {
+    bottom: -25vw;
+    right: -10vw;
+    background: var(--aurora-2);
+    animation: aurora-b 32s ease-in-out infinite;
+  }
+  /* Faint Minecraft-block grid overlay. */
+  .app-grid {
+    position: fixed;
+    inset: 0;
+    z-index: -9;
+    pointer-events: none;
+    background-image:
+      linear-gradient(var(--grid-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+    background-size: 44px 44px;
+    mask-image: radial-gradient(120% 80% at 50% 0%, black, transparent 75%);
+    -webkit-mask-image: radial-gradient(
+      120% 80% at 50% 0%,
+      black,
+      transparent 75%
+    );
+  }
+
+  .shimmer {
+    background: linear-gradient(
+      100deg,
+      transparent 20%,
+      color-mix(in oklch, var(--muted-fg) 12%, transparent) 50%,
+      transparent 80%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.4s ease-in-out infinite;
+  }
+}
+
+@keyframes aurora-a {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(6vw, 4vh, 0) scale(1.12);
+  }
+}
+@keyframes aurora-b {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1.05);
+  }
+  50% {
+    transform: translate3d(-5vw, -4vh, 0) scale(0.95);
+  }
+}
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-bg::before,
+  .app-bg::after,
+  .shimmer {
+    animation: none !important;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
